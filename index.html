@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Rút Kim Cương Tự Động</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+        }
+        .wrapper {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        .header {
+            background-color: #e53935;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        /* Nút ẩn bí mật nằm ở dấu chấm này */
+        .secret-dot {
+            cursor: pointer;
+            color: inherit;
+        }
+        .content {
+            padding: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+        }
+        .btn-red {
+            background-color: #e53935;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+        .btn-login {
+            background-color: #e53935;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .package-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+        .package-card.selected {
+            border-color: #e53935;
+            background-color: #ffebee;
+            color: #e53935;
+        }
+        /* Popup thông báo rút thành công giống ảnh */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .popup {
+            background: white;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .success-icon {
+            width: 50px;
+            height: 50px;
+            background: #e8f5e9;
+            color: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            margin: 0 auto 15px;
+            border: 2px solid #4caf50;
+        }
+        .popup-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .popup-sub {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .popup-info {
+            text-align: left;
+            font-size: 14px;
+            color: #444;
+            border-top: 1px dashed #eee;
+            padding-top: 15px;
+            margin-bottom: 20px;
+        }
+        .popup-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .hidden { display: none !important; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e53935;
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        💎 Rút Kim Cương Tự Động<span class="secret-dot" onclick="openSecretMenu()">.</span>
+    </div>
+    
+    <div class="content">
+        <div style="background: #fff3e0; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; color: #e65100; text-align: center;">
+            Số dư hiện tại: <span id="current-balance">50,000</span> KC
+        </div>
+
+        <div class="form-group">
+            <label>ID Game</label>
+            <div class="input-row">
+                <input type="text" id="gameId" placeholder="Nhập ID nhân vật...">
+                <button class="btn-login" onclick="alert('Đã đồng bộ ID thành công!')">Đăng Nhập</button>
+            </div>
+        </div>
+
+        <label>Chọn gói KC muốn rút</label>
+        <div class="grid-container">
+            <div class="package-card" onclick="selectPackage(this, 100)">100 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 500)">500 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 1000)">1,000 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 2000)">2,000 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 5000)">5,000 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 10000)">10,000 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 20000)">20,000 KC</div>
+            <div class="package-card" onclick="selectPackage(this, 50000)">50,000 KC</div>
+        </div>
+
+        <button class="btn-red" onclick="startProcess()">🗂️ RÚT KIM CƯƠNG</button>
+        <p style="text-align: center; color: #e53935; font-size: 14px; margin-top: 15px; cursor: pointer;">📋 Lịch sử Rút KC</p>
+    </div>
+
+    <div id="loading-overlay" class="overlay hidden">
+        <div class="popup">
+            <div class="loader"></div>
+            <p style="font-weight: bold; color: #333;">Đang xử lý giao dịch...</p>
+        </div>
+    </div>
+
+    <div id="success-overlay" class="overlay hidden">
+        <div class="popup">
+            <div class="success-icon">✓</div>
+            <div class="popup-title">Rút Thành Công</div>
+            <div class="popup-sub">Giao dịch của bạn đã được ghi nhận thành công</div>
+            
+            <div class="popup-info">
+                <div class="popup-row">
+                    <span>ID Nhân Vật:</span>
+                    <strong id="pop-id">15722621582</strong>
+                </div>
+                <div class="popup-row">
+                    <span>Gói rút:</span>
+                    <strong id="pop-package" style="color: #e53935;">-1,000 KC</strong>
+                </div>
+                <div class="popup-row">
+                    <span>Số dư còn lại:</span>
+                    <strong id="pop-remain" style="color: #4caf50;">49,000 KC</strong>
+                </div>
+            </div>
+
+            <button class="btn-red" style="margin: 0; padding: 10px;" onclick="closePopup()">Hoàn tất</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentBalance = 50000; // Số dư mặc định ban đầu
+    let selectedAmount = 0;
+
+    // Cập nhật số dư hiển thị lên giao diện ban đầu
+    document.getElementById('current-balance').innerText = currentBalance.toLocaleString();
+
+    // Hàm chọn gói KC
+    function selectPackage(element, amount) {
+        let cards = document.querySelectorAll('.package-card');
+        cards.forEach(card => card.classList.remove('selected'));
+        
+        element.classList.add('selected');
+        selectedAmount = amount;
+    }
+
+    // Hàm xử lý khi bấm nút RÚT KIM CƯƠNG
+    function startProcess() {
+        let idInput = document.getElementById('gameId').value;
+        if(idInput.trim() === "") {
+            alert("Vui lòng nhập ID Game trước khi rút!");
+            return;
+        }
+        if(selectedAmount === 0) {
+            alert("Vui lòng bấm chọn 1 gói Kim Cương!");
+            return;
+        }
+        if(selectedAmount > currentBalance) {
+            alert("Số dư không đủ để thực hiện gói rút này!");
+            return;
+        }
+
+        // Hiện loading giả vờ trong 1.5 giây
+        document.getElementById('loading-overlay').classList.remove('hidden');
+
+        setTimeout(function() {
+            // Ẩn loading
+            document.getElementById('loading-overlay').classList.add('hidden');
+
+            // Trừ số dư thực tế trên web
+            currentBalance = currentBalance - selectedAmount;
+            document.getElementById('current-balance').innerText = currentBalance.toLocaleString();
+
+            // Đổ dữ liệu vào bảng thông báo thành công giống ảnh của bạn
+            document.getElementById('pop-id').innerText = idInput;
+            document.getElementById('pop-package').innerText = "-" + selectedAmount.toLocaleString() + " KC";
+            document.getElementById('pop-remain').innerText = currentBalance.toLocaleString() + " KC";
+
+            // Hiển thị bảng thành công
+            document.getElementById('success-overlay').classList.remove('hidden');
+        }, 1500); 
+    }
+
+    function closePopup() {
+        document.getElementById('success-overlay').classList.add('hidden');
+        // Bạn có thể cài cú bẻ lái troll ở đây nếu muốn, hiện tại đang cho bấm "Hoàn tất" để tiếp tục xem số dư bị trừ như thật.
+    }
+
+    // 🔴 CHỨC NĂNG BÍ MẬT: Bấm vào dấu chấm của chữ "Tự Động." để chỉnh số dư
+    function openSecretMenu() {
+        let password = prompt("Nhập mật mã quản trị (Gợi ý: admin):");
+        if(password === "admin") {
+            let newBalance = prompt("Nhập số kim cương bạn muốn cài đặt sẵn:", currentBalance);
+            if(newBalance !== null && !isNaN(newBalance)) {
+                currentBalance = parseInt(newBalance);
+                document.getElementById('current-balance').innerText = currentBalance.toLocaleString();
+                alert("Đã hack số dư thành công thành: " + currentBalance.toLocaleString() + " KC!");
+            }
+        } else {
+            alert("Sai mật mã! Đừng gạt tôi nhé bồ tèo.");
+        }
+    }
+</script>
+
+</body>
+</html>
